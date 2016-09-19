@@ -1,0 +1,84 @@
+{% extends "layout.html" %}
+
+{% block name %}Tournament{% endblock %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+        <div class="parent-panel">
+            {% block input %}{% endblock %}
+	    	<div class="table-panel">
+		        <h3>{% block announce %}{% endblock %}</h3>
+    	    	<h2>
+    		    	{% for card in comm_cards %}
+    		    	    {% if show_images %}
+    			    	    <img src="{{ '/static/images/low_res/'|add:card.name|add:'.png' }}" style="width:5vw">
+    		    		{% else %}
+    			    	    {{ card.name }}
+    			    	{% endif %}
+    		    	{% endfor %}
+    	    	</h2>
+    	    	<h3>
+    	    	    Pot: {{ game.pot }}
+    	    	</h3>
+    	    	{{ game.training_text }}
+		    </div>
+		</div>
+
+		<div class="cards">
+		{% for player in players %}
+
+			<div class="card">
+				{% if player.name == "You" %}
+				<header style="background-color:#490092">
+				{% else %}
+				<header>
+				{% endif %}
+					{% if player.last_act == "Fold" %}
+					    {% if player.name == "You" %}
+					        <span style="color:#743049">
+					    {% else %}
+						    <span style="color:#006969">
+						{% endif %}
+					{% endif %}
+					{{ player.name }} : ({{ player.title }})
+					<b> {{ player.last_act }}</b>
+					{% if player.last_act == "Fold" %}
+						</span>
+					{% endif %}
+				</header>
+
+				<div class="card-copy">
+
+					{% for card in player.cards.all %}
+						{% if not card.is_comm_card %}
+						    {% if show_op_cards or player.name == 'You' %}
+						        {% if show_images %}
+							        <img src="{{ '/static/images/low_res/'|add:card.name|add:'.png' }}" style="width:5vw">
+							    {% else %}
+							        <h2>{{ card.name }}</h2>
+							    {% endif %}
+							 {% else %}
+							    {% if show_images %}
+							        <img src="{{ '/static/images/low_res/card_back.jpg' }}" style="width:75px">
+							    {% endif %}
+							 {% endif %}
+						{% endif %}
+					{% endfor %}
+					<p></p>
+					{% if player.last_act == "Fold" %}
+						<span style="color:#d3d3d3">
+					{% endif %}
+					in for: {{ player.money_in }}
+					<p></p>
+					stack: {{ player.stack }}
+					{% if player.last_act == "Fold" %}
+						</span>
+					{% endif %}
+				</div>
+			</div>
+
+		{% endfor %}
+		</div>
+
+{% endblock %}

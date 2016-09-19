@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block title %}{% endblock %}
+
+{% block name %}Welcome to pk-trainer.{% endblock %}
+
+{% block content %}
+    <div class="parent-panel">
+        <div id="home" class="table-panel">
+
+                <h1>welcome to pk-trainer.</h1>
+                <br>
+                <h3>
+                <p>a fun, free way to improve your Texas Hold'em game.</p>
+                <form method="POST" action="{% url 'new' %}">
+    		        {% csrf_token %}
+    		        <button type="submit" name="just_play">Just Start Playing</button>
+    	       </form>
+    	       <span style="text-align:justify;">
+                    <p>Or, here are a few tips to get you started:</p>
+                    <ul>
+                        <p><li>Slow connection?  Visit Game Settings to turn off card image display.</li></p>
+                        <p><li>Need more/fewer training wheels?  Visit Game Settings to toggle training tools such as odds calculations, opponent card display, etc.</li></p>
+                        <p><li>Opponents too smart/too dumb?  Visit Opponent AI Settings to adjust.</li></p>
+                        <p><li>Want to test out how a strategy performs on the aggregate against a particular type of opponent?  Visit AI Opponent Settings to run unmanned simulations.</li></p>
+                        <p><li>Like math?  Don't miss the Stats page!</li></p>
+                    </ul>
+                    <br>
+                    <p>Enjoy, and email me at slater4564@gmail.com with any problems or feature requests.</p>
+                </h3></span>
+
+        </div>
+    </div>
+{% endblock %}

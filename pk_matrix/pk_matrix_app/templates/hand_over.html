@@ -1,0 +1,17 @@
+{% extends "game_layout.html" %}
+{% load pk_extras %}
+
+{% block announce %}
+    <h3>All players have folded except one. {{ game.winner }} win{{ game.winner|conjug }} the {{ game.pot }} pot!</h3>
+{% endblock %}
+
+{% block input %}
+	<div class="control-panel">
+	    <h3>Player Controls:</h3>
+	    <form method="POST" action="{% url 'game_round' game.id %}">
+	    	{% csrf_token %}
+	    	<button type="submit">Next hand</button>
+    	</form>
+	</div>
+
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "game_layout.html" %}
+
+{% block announce %}
+    pre-flop betting finished.
+{% endblock %}
+
+{% block input %}
+	<div class="control-panel">
+	    <h3>Player Controls:</h3>
+	    <form method="POST" action="flop">
+		    {% csrf_token %}
+		    <button type="submit">Deal flop</button>
+	    </form>
+	</div>
+
+{% endblock %}

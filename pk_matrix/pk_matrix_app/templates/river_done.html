@@ -1,0 +1,16 @@
+{% extends "game_layout.html" %}
+
+{% block announce %}
+    river betting finished.
+{% endblock %}
+
+{% block input %}
+	<div class="control-panel">
+	    <h3>Player Controls:</h3>
+	    <form method="POST" action="showdown">
+		    {% csrf_token %}
+	    	<button type="submit">Showdown</button>
+    	</form>
+    </div>
+
+{% endblock %}

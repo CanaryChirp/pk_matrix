@@ -1,0 +1,6 @@
+{% extends "layout.html" %}
+{% load pk_extras %}
+
+{% block content %}
+	tournament over.  {{ game.winner }} win{{ game.winner|conjug }}!
+{% endblock %}

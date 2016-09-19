@@ -1,0 +1,248 @@
+Button {
+	-moz-box-shadow: 0px 0px 0px 1px #642039;
+	-webkit-box-shadow: 0px 0px 0px 1px #642039;
+	box-shadow: 0px 0px 0px 1px #642039;
+
+
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, black), color-stop(1, black));
+	background:-moz-linear-gradient(top, #009292 5%, #004949 100%);
+	background:-webkit-linear-gradient(top, #009292 5%, #004949 100%);
+	background:-o-linear-gradient(top, #009292 5%, #004949 100%);
+	background:-ms-linear-gradient(top, #009292 5%, #004949 100%);
+	background:linear-gradient(to bottom, #009292 5%, #004949 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='black', endColorstr='black',GradientType=0);
+	background-color:#009292;
+
+
+    /*
+    background-image: url(/static/images/squared_metal.png), -webkit-linear-gradient(top, #009025 5%, #005000 100%);
+    */
+
+
+	-moz-border-radius:10px;
+	-webkit-border-radius:2px;
+	border-radius:10px;
+	border:1px solid black;
+	display:inline-block;
+	cursor:pointer;
+	color:black;
+	font-size:16px;
+	font-weight: bold;
+	font-family:Times New Roman, Times;
+	padding:0px 5px;
+	margin: 3px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #283966;
+	height: 7vh;
+	width: 10vw;
+	vertical-align:middle;
+}
+Button:hover {
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #476e9e), color-stop(1, #7892c2));
+	background:-moz-linear-gradient(top, #004949 5%, #009292 100%);
+	background:-webkit-linear-gradient(top, #004949 5%, #009292 100%);
+	background:-o-linear-gradient(top, #004949 5%, #009292 100%);
+	background:-ms-linear-gradient(top, #004949 5%, #009292 100%);
+	background:linear-gradient(to bottom, #004949 5%, #009292 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#476e9e', endColorstr='#7892c2',GradientType=0);
+	background-color:#004949;
+	color:white;
+}
+Button:active {
+	position:relative;
+	top:1px;
+}
+
+Input{
+    margin: 0px;
+}
+
+div.control-panel{
+    width: 25vw;
+    height: 40vh;
+    border: 2px solid black;
+    display: inline-block;
+    margin: 0px 10px 0px 10px;
+    vertical-align:top;
+    border-radius:10px;
+    padding: 0.3vh;
+    background-image: url(/static/images/binding_light.png);
+    background-repeat:repeat;
+    text-align: center;
+}
+
+div.parent-panel{
+    text-align: center;
+}
+
+div.table-panel{
+    width: 40vw;
+    height: 40vh;
+    border: 2px solid black;
+    display: inline-block;
+    margin: 0px 10px 20px 10px;
+    vertical-align:top;
+    border-radius:10px;
+    padding: 0.3vh;
+    background-image: url(/static/images/binding_light.png);
+    background-repeat:repeat;
+    text-align: center;
+}
+
+#home{
+    overflow:auto;
+    width: 60vw;
+    height: 100vh;
+    padding: 1vh 2vw 1vh 2vw;
+}
+
+body{
+    background-color:white;
+}
+
+
+html {
+  box-sizing: border-box; }
+
+*, *::after, *::before {
+  box-sizing: inherit; }
+
+.site-container {
+  max-width: 68em;
+  margin-left: auto;
+  margin-right: auto; }
+  .site-container::after {
+    clear: both;
+    content: "";
+    display: table; }
+  .site-container nav {
+      border: 2px solid black;
+    width: 100%;
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, black), color-stop(1, black));
+	background:-moz-linear-gradient(top, #009292 5%, #004949 100%);
+	background:-webkit-linear-gradient(top, #009292 5%, #004949 100%);
+	background:-o-linear-gradient(top, #009292 5%, #004949 100%);
+	background:-ms-linear-gradient(top, #009292 5%, #004949 100%);
+	background:linear-gradient(to bottom, #009292 5%, #004949 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='black', endColorstr='black',GradientType=0);
+	background-color:#009292;
+    margin-bottom: 1em;
+    overflow: hidden; }
+    .site-container nav a {
+      display: table-cell;
+      width: 8.33333%;
+      padding: 10px;
+      color: black;
+      font-size:20px;
+      font-weight: bold;
+      letter-spacing: 0.075em;
+      line-height: 40px;
+      text-align: center;
+      text-decoration: none; }
+      .site-container nav a:hover {
+          background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #476e9e), color-stop(1, #7892c2));
+	    background:-moz-linear-gradient(top, #004949 5%, #009292 100%);
+    	background:-webkit-linear-gradient(top, #004949 5%, #009292 100%);
+    	background:-o-linear-gradient(top, #004949 5%, #009292 100%);
+    	background:-ms-linear-gradient(top, #004949 5%, #009292 100%);
+    	background:linear-gradient(to bottom, #004949 5%, #009292 100%);
+    	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#476e9e', endColorstr='#7892c2',GradientType=0);
+    	background-color:#004949;
+        color: white; }
+
+.cards {
+  display: -webkit-box;
+  display: -moz-box;
+  display: box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-lines: multiple;
+  -moz-box-lines: multiple;
+  box-lines: multiple;
+  -webkit-flex-wrap: wrap;
+  -moz-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: justify;
+  -moz-box-pack: justify;
+  box-pack: justify;
+  -webkit-justify-content: space-between;
+  -moz-justify-content: space-between;
+  -ms-justify-content: space-between;
+  -o-justify-content: space-between;
+  justify-content: space-between;
+  -ms-flex-pack: justify; }
+
+.card {
+  -webkit-flex-basis: 13vw;
+  -moz-flex-basis: 13vw;
+  flex-basis: 13vw;
+  -ms-flex-preferred-size: 13vw;
+  -webkit-flex-grow: 1;
+  -moz-flex-grow: 1;
+  flex-grow: 1;
+  -ms-flex-positive: 1;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+  background-image: url(/static/images/binding_light.png);
+  background-repeat:repeat;
+  background-color: #f6f6f6;
+  border-radius: 14px;
+  border: 2px solid black;
+  box-shadow: 0 2px 4px #e6e6e6;
+  margin: 0 0.5vw 1.5em 0.5vw;
+  position: relative;
+  text-align: center;
+}
+  .card header {
+    -webkit-transition: all 0.2s ease-in-out;
+    -moz-transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
+
+	background-color:#009292;
+
+
+    border-bottom: 1px solid gainsboro;
+    border-radius: 10px 10px 0 0;
+    font-weight: bold;
+    line-height: 1.5em;
+    padding: 0.5em 0.75em; }
+    .card header a {
+      color: #007015;
+      text-decoration: none; }
+      .card header a:hover {
+        text-decoration: underline; }
+  .card .card-copy {
+    font-size: 0.9em;
+    line-height: 1.5em;
+    padding: 0.75em 0.75em; }
+    .card .card-copy p {
+      margin: 0 0 0.75em; }
+
+article h2 a,
+article h3 a {
+  color: #007015;
+  text-decoration: none; }
+  article h2 a:hover,
+  article h3 a:hover {
+    text-decoration: underline; }
+article .steps {
+  border-top: 2px solid #e6557e; }
+  article .steps h3 + p {
+    margin-left: 1em; }
+
+/*# sourceMappingURL=layout.css.map */

@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>Players</h1>
+	{% for player in players %}
+		{{ player.name }}
+	{% endfor %}
+
+<h1>Games</h1>
+	{% for game in games %}
+		<p> game.id: {{ game.id }} </p>
+		current round: {{ game.current_round }}
+	{% endfor %}
+
+<h1>Profiles</h1>
+    {% for profile in profiles %}
+        <p> profile.id: {{ profile.id }} </p>
+        profile.percentage: {{ profile.percentage }}
+	{% endfor %}
+
+{% endblock %}

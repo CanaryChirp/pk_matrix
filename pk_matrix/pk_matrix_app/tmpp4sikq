@@ -1,0 +1,349 @@
+from django.shortcuts import render, render_to_response
+from django.http import HttpResponseRedirect
+import datetime
+from django.core.urlresolvers import reverse
+from .forms import GameSettingsForm, AISettingsForm
+from django.contrib.sessions.backends.db import SessionStore
+from django.template import RequestContext
+
+#from io import StringIO
+import io
+import re
+
+from django.core.files.uploadedfile import InMemoryUploadedFile
+
+from PIL import Image
+
+from .forms import DocumentForm, AISettingsForm
+from .models import Player, Game, Document, AI_Profile_Set, AI_Profile
+
+def prepopulate_settings(request):
+    if 'show_images' not in request.session:
+        request.session['show_images'] = True
+    if 'show_op_cards' not in request.session:
+        request.session['show_op_cards'] = True
+    if 'training_text' not in request.session:
+        request.session['training_text'] = True
+    if 'n_players' not in request.session:
+        request.session['n_players'] = 4
+    if 'starting_stacks' not in request.session:
+        request.session['starting_stacks'] = 200
+    request.session.save()
+
+def index(request):
+    return render(request, 'home.html')
+
+def game_settings(request):
+    form_class = GameSettingsForm
+    return render(request, 'game_settings.html', {'form': form_class})
+
+def game_settings_updated(request):
+    form_class = GameSettingsForm
+    if request.method == 'POST':
+        form = form_class(data=request.POST)
+        if form.is_valid():
+            image_choice = request.POST.get('show_images', '')
+            if image_choice == '1':
+                request.session['show_images'] = True
+            else:
+                request.session['show_images'] = False
+
+            opponent_choice = request.POST.get('opponent_cards', '')
+            if opponent_choice == '1':
+                request.session['show_op_cards'] = True
+            else:
+                request.session['show_op_cards'] = False
+
+            training_choice = request.POST.get('training_text', '')
+            if training_choice == '1':
+                request.session['training_text'] = True
+            else:
+                request.session['training_text'] = False
+
+            n_choice = int(request.POST.get('number_of_players', ''))
+            request.session['n_players'] = n_choice
+
+            stack_choice = int(request.POST.get('starting_stacks', ''))
+            request.session['starting_stacks'] = stack_choice
+
+            request.session.save()
+
+            return render(request, 'game_settings_updated.html')
+    return render(request, 'error.html', {'request_method': request.method})
+
+def ai_settings(request):
+
+    session_key = request.session.session_key
+    found = False
+    for p_set in AI_Profile_Set.objects.all():
+        if p_set.session_key == session_key:
+            prof_set = p_set
+            found = True
+            break
+    if not found:
+        prof_set = AI_Profile_Set(session_key=session_key)
+        prof_set.save()
+        profile = AI_Profile(profile_set=prof_set)
+        profile.save()
+    prof_set.save()
+
+    form_class = AISettingsForm(profile_set=prof_set)
+    selected = form_class.fields['Profile to edit:']
+    #selected = dict(form_class.fields['Profile to edit:'].choices)[selected]
+
+    if request.method == "POST":
+        if "new_prof" in request.POST:
+            AI_Profile(profile_set=prof_set).save()
+        elif "delete" in request.POST:
+            count = 1
+            for profile in prof_set.ai_profile_set.all():
+                if count == selected:
+                    profile.delete()
+        elif "sub_edits" in request.POST:
+            pass
+
+    #form_class = AISettingsForm(profile_set=prof_set)
+    return render(request, 'ai_settings.html', {'form': form_class})
+
+def stats(request):
+	return render(request, 'stats.html')
+
+def new_game(request):
+	prepopulate_settings(request)
+	game = Game(session_key=request.session.session_key)
+	game.printlog("\n"*3)
+	game.printlog("-"*20)
+	game.printlog(str(datetime.datetime.now()))
+	game.printlog("Starting new tournament")
+	game.save()
+	return HttpResponseRedirect(reverse('game_round', kwargs={'game_pk': game.id}))
+
+def start_pre_flop(request, game_pk):
+	game = Game.objects.get(id=game_pk)
+	game.printlog("\n")
+	game.printlog("in views.start_pre_flop")
+	if game.winner != "":
+		game.hand_over()
+		game.refresh_from_db()
+		if game.myStatus == "end":
+			game.winner = game.player_set.first().name
+			game.save()
+			players = game.player_set.all()
+			comm_cards = []
+			for card in game.player_set.first().cards.all():
+				if card.is_comm_card:
+					comm_cards.append(card)
+			return render(request, 'tournament_over.html', {'players': players, 'comm_cards': comm_cards, 'game': game})
+	game.prepare_game()
+	return HttpResponseRedirect(reverse('preflop', kwargs={'game_pk': game.id}))
+
+def continue_pre_flop(request, game_pk):
+	get_action(request, game_pk)
+	game = Game.objects.get(id=game_pk)
+	game.printlog("\n")
+	game.printlog("in views.continue_pre_flop")
+	game.start_pre_flop()
+	game.refresh_from_db()
+	return route_game(request, game, 'pre_flop.html', 'pre_flop_done.html')
+
+def route_game(request, game, url_cont, url_done):
+	game.refresh_from_db()
+	game.printlog("\n")
+	game.printlog("in views.route_game")
+	players = game.player_set.all()
+	comm_cards = []
+	session = SessionStore(session_key=game.session_key)
+	data = {'players': players, 'comm_cards': comm_cards, 'game': game, 'show_images': session['show_images'], 'show_op_cards': session['show_op_cards']}
+	for card in game.player_set.first().cards.all():
+		if card.is_comm_card:
+			comm_cards.append(card)
+	if game.myStatus == "waiting":
+		game.printlog("continuing round to {}".format(url_cont))
+		game.save()
+		return render(request, url_cont, data)
+	elif game.myStatus == "":
+		game.printlog("ending round to {}".format(url_done))
+		return render(request, url_done, data)
+	elif game.myStatus == "showdown":
+		game.printlog("ending round to showdown")
+		return showdown(request, game.id)
+	elif game.myStatus == "done":
+		game.printlog("hand over.")
+		return render(request, 'hand_over.html', data)
+
+
+def flop(request, game_pk):
+	get_action(request, game_pk)
+	game = Game.objects.get(id=game_pk)
+	game.printlog("\n")
+	game.printlog("in views.flop")
+	if game.current_round == "pre_flop":
+		game.prepare_flop()
+	game.flop()
+
+	return route_game(request, game, 'flop.html', 'flop_done.html')
+
+def turn(request, game_pk):
+	get_action(request, game_pk)
+	game = Game.objects.get(id=game_pk)
+	game.printlog("\n")
+	game.printlog("in views.turn")
+	if game.current_round == "flop":
+		game.prepare_turn()
+	game.turn()
+	return route_game(request, game, 'turn.html', 'turn_done.html')
+
+def river(request, game_pk):
+	get_action(request, game_pk)
+	game = Game.objects.get(id=game_pk)
+	game.printlog("\n")
+	game.printlog("in views.river")
+	if game.current_round == "turn":
+		game.prepare_river()
+	game.river()
+	return route_game(request, game, 'river.html', 'river_done.html')
+
+def showdown(request, game_pk):
+	game = Game.objects.get(id=game_pk)
+	game.printlog("\n")
+	game.printlog("in views.showdown")
+	game.showdown()
+	game.refresh_from_db()
+	players = game.player_set.all()
+	comm_cards = []
+	for card in game.player_set.first().cards.all():
+		if card.is_comm_card:
+			comm_cards.append(card)
+	return render(request, 'showdown.html', {'players': players, 'comm_cards': comm_cards, 'game': game})
+
+def get_action(request, game_pk):
+
+	get_text = ""
+	if request.method == "POST":
+		if "Fold" in request.POST:
+			get_text = "Fold"
+		elif "Call" in request.POST:
+			get_text = "Call"
+		elif "Raise" in request.POST:
+			get_text = "Raise" + request.POST["textfield"]
+
+		game = Game.objects.get(id=game_pk)
+		game.printlog("\n")
+		game.printlog("in views.get_action")
+		game.user_input = get_text
+		game.save()
+		game.printlog("user input: {}".format(get_text))
+
+
+# troubleshooting pages
+def players(request):
+	players = Player.objects.all()
+	games = Game.objects.all()
+	profiles = AI_Profile.objects.all()
+	return render(request, 'players.html', {'players': players, 'games': games, 'profiles': profiles})
+
+def photo_test(request):
+    return render(request, 'photo_test.html')
+
+def flip_horizontal(im): return im.transpose(Image.FLIP_LEFT_RIGHT)
+def flip_vertical(im): return im.transpose(Image.FLIP_TOP_BOTTOM)
+def rotate_180(im): return im.transpose(Image.ROTATE_180)
+def rotate_90(im): return im.transpose(Image.ROTATE_90)
+def rotate_270(im): return im.transpose(Image.ROTATE_270)
+def transpose(im): return rotate_90(flip_horizontal(im))
+def transverse(im): return rotate_90(flip_vertical(im))
+orientation_funcs = [None,
+                 lambda x: x,
+                 flip_horizontal,
+                 rotate_180,
+                 flip_vertical,
+                 transpose,
+                 rotate_270,
+                 transverse,
+                 rotate_90
+                ]
+def apply_orientation(im):
+    """
+    Extract the oritentation EXIF tag from the image, which should be a PIL Image instance,
+    and if there is an orientation tag that would rotate the image, apply that rotation to
+    the Image instance given to do an in-place rotation.
+
+    :param Image im: Image instance to inspect
+    :return: A possibly transposed image instance
+    """
+
+    try:
+        kOrientationEXIFTag = 0x0112
+        if hasattr(im, '_getexif'): # only present in JPEGs
+            e = im._getexif()       # returns None if no EXIF data
+            if e is not None:
+                #log.info('EXIF data found: %r', e)
+                orientation = e[kOrientationEXIFTag]
+                f = orientation_funcs[orientation]
+                return f(im)
+    except:
+        # We'd be here with an invalid orientation value or some random error?
+        pass # log.exception("Error applying EXIF Orientation tag")
+    return im
+
+def add_secs(tm, sec):
+    fulldate = datetime.datetime(100, 1, 1, tm.hour, tm.minute, tm.second)
+    fulldate = fulldate + datetime.timedelta(seconds=sec)
+    return fulldate.time()
+
+def clean_old_docs():
+    documents = Document.objects.all()
+    for doc in documents:
+        if (datetime.datetime.now().time() > add_secs(doc.creation_date.time(), 300)) or (datetime.datetime.now().time() < doc.creation_date.time()):
+            doc.delete()
+
+def list(request):
+    # Handle file upload
+    clean_old_docs()
+    if request.method == 'POST':
+        form = DocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            filename = request.FILES['docfile']
+            original = Image.open(filename)
+            original = apply_orientation(original)
+            width, height = original.size
+            new_width = (int) (427*(width/height))
+            if new_width <= 620:
+                new_height = 427
+            else:
+                new_height = (int) (620*(height/width))
+                new_width = 620
+            thumb = original.resize((new_width,new_height), Image.ANTIALIAS)
+            old_size = (new_width, new_height)
+            new_size = (640, 427)
+            thumb2 = Image.new("RGB", new_size, "white")
+            thumb2.paste(thumb, ((int)((new_size[0]-old_size[0])/2+1),
+                      (int)((new_size[1]-old_size[1])/2)))
+
+
+            thumb_io = io.BytesIO()
+            thumb2.save(thumb_io, format='JPEG')
+            reg_ex = re.search(r'(?P<no_ext>[\w\d\s/*]*).(?P<ext>[\w\d\s]*)$',request.FILES['docfile'].name)
+            new_filename = reg_ex.group('no_ext') + '_resized.' + reg_ex.group('ext')
+            thumb_file = InMemoryUploadedFile(thumb_io, None, new_filename, 'image/jpeg',
+                                  256, None)
+
+
+            newdoc = Document(docfile = thumb_file)
+            newdoc.save()
+
+
+            # Redirect to the document list after POST
+            return HttpResponseRedirect(reverse('list'))
+    else:
+        form = DocumentForm() # A empty, unbound form
+
+    # Load documents for the list page
+    documents = Document.objects.all()
+
+    # Render list page with the documents and the form
+    return render_to_response(
+        'list.html',
+        {'documents': documents, 'form': form},
+        context_instance=RequestContext(request)
+    )

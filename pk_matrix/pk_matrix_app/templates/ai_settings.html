@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block name %}AI Settings{% endblock %}
+
+{% block title %}AI Settings{% endblock %}
+
+{% block content %}
+        <h2>Settings will persist for the duration of your browser session, and be applied to all new tournaments started.</h2>
+		<form role="form" action="#" method="post">
+		    {% csrf_token %}
+		    <button type="submit" name="new_prof">Add new profile</button>
+		    {{ form.as_p }}
+		    <button type="submit" name="sub_edits">Submit Edits</button>
+		    <button type="submit" name="delete_prof">Delete Profile</button>
+		</form>
+{% endblock %}

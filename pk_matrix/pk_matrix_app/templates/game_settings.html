@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block name %}Game Settings{% endblock %}
+
+{% block title %}Game Settings{% endblock %}
+
+{% block content %}
+        <h2>Settings will persist for the duration of your browser session, and be applied to all new tournaments started.</h2>
+		<form role="form" action="updated" method="post">
+		    {% csrf_token %}
+		    {{ form.as_p }}
+		    <button type="submit">Submit</button>
+		</form>
+{% endblock %}

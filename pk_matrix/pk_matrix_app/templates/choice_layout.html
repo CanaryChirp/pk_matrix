@@ -1,0 +1,21 @@
+{% extends "game_layout.html" %}
+{% load staticfiles %}
+
+{% block input %}
+	<div class="control-panel">
+	    <h3>Player Controls:</h3>
+    	<form method="POST" action="">
+    		{% csrf_token %}
+    		<button type="submit" name="Fold">Fold</button>
+    		<button type="submit" name="Call">Call / minBet</button>
+    		<p>
+    		    <button type="submit" name="Raise">Raise</button>
+                </p>
+                    Enter multiple of minBet (1-10):
+
+    		    <input type="text" name="textfield">
+
+    	</form>
+	</div>
+
+{% endblock %}

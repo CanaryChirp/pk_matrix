@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+{% load pk_extras %}
+
+{% block name %}Tournament{% endblock %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+    <h3><span style="margin:auto; display:table;">Showdown: {{ game.winner }} win{{ game.winner|conjug }} the {{ game.pot }} pot!</span></h3>
+		<div class="parent-panel">
+		    {% block input %}{% endblock %}
+		    <div class="control-panel">
+	            <h3>Player Controls:</h3>
+		        <form method="POST" action="{% url 'game_round' game.id %}">
+		            {% csrf_token %}
+		    	    <button type="submit">Next Hand</button>
+	    	    </form>
+	        </div>
+	        <div class="table-panel">
+		        <h2>
+			        {% for card in comm_cards %}
+				        <img src="{{ '/static/images/low_res/'|add:card.name|add:'.png' }}" style="width:5vw">
+			        {% endfor %}
+		        </h2>
+		        Pot: {{ game.pot }}
+		        <p>{{ game.training_text }}</p>
+		    </div>
+		</div>
+
+		<div class="cards">
+		{% for player in players %}
+			{% if not player.last_act == 'Fold' %}
+
+
+
+			<div class="card">
+				{% if player.name == "You" %}
+				<header style="background-color:#642039">
+				{% else %}
+				<header>
+				{% endif %}
+					{% if player.last_act == "Fold" %}
+						<span style="color:#d3d3d3">
+					{% endif %}
+					{{ player.name }} : ({{ player.title }})
+					{% if player.last_act == "Fold" %}
+						</span>
+					{% endif %}
+				</header>
+
+				<div class="card-copy">
+
+					{% for card in player.cards.all %}
+						{% if not card.is_comm_card %}
+							<img src="{{ '/static/images/low_res/'|add:card.name|add:'.png' }}" style="width:5vw">
+						{% endif %}
+					{% endfor %}
+					<p></p>
+					{% if player.last_act == "Fold" %}
+						<span style="color:#d3d3d3">
+					{% endif %}
+					<h3>{{ player.best_hand }}</h3>
+					<p></p>
+					rank: {{ player.rank }}
+					{% if player.last_act == "Fold" %}
+						</span>
+					{% endif %}
+				</div>
+			</div>
+			{% endif %}
+		{% endfor %}
+		</div>
+
+{% endblock %}
